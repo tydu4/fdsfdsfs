@@ -26,7 +26,7 @@
         <a href="#tables-section">Таблицы</a>
       </nav>
       <div class="header-action">
-        <button id="runBtn" type="button">Запустить расчет</button>
+        <button id="runBtn" type="button" class="header-run-btn">Запустить расчет</button>
       </div>
     </div>
   </header>
@@ -39,45 +39,58 @@
           результат по каждому лицевому счету.</p>
       </div>
       <div class="hero-visual" aria-hidden="true">
-        <svg class="hero-illustration" viewBox="0 0 560 330">
+        <svg class="hero-illustration hero-network" viewBox="0 0 560 330">
           <defs>
-            <linearGradient id="heroFrame" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#F6F8FF" />
-              <stop offset="100%" stop-color="#FBF7FF" />
+            <linearGradient id="netFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F5F9FF" />
+              <stop offset="100%" stop-color="#F8F6FF" />
             </linearGradient>
-            <linearGradient id="heroAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2342F6" stop-opacity="0.86" />
-              <stop offset="100%" stop-color="#7A22F7" stop-opacity="0.78" />
+            <linearGradient id="netCore" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2460FF" />
+              <stop offset="100%" stop-color="#11C2FF" />
             </linearGradient>
-            <linearGradient id="heroSoftLine" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#2342F6" stop-opacity="0.18" />
-              <stop offset="100%" stop-color="#7A22F7" stop-opacity="0.16" />
+            <linearGradient id="netStroke" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2C58FF" stop-opacity="0.26" />
+              <stop offset="100%" stop-color="#00C4F0" stop-opacity="0.34" />
+            </linearGradient>
+            <radialGradient id="netAura" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#58B6FF" stop-opacity="0.42" />
+              <stop offset="100%" stop-color="#58B6FF" stop-opacity="0" />
             </linearGradient>
           </defs>
-          <rect x="26" y="28" width="508" height="274" rx="30" fill="url(#heroFrame)" stroke="#DCE4FF" />
-          <circle cx="468" cy="68" r="48" fill="url(#heroSoftLine)" />
-          <circle cx="108" cy="268" r="56" fill="url(#heroSoftLine)" />
+          <rect x="22" y="20" width="516" height="290" rx="30" fill="url(#netFrame)" stroke="#D7E1FF" />
 
-          <rect x="56" y="58" width="232" height="92" rx="16" fill="#FFFFFF" stroke="#DCE4FF" />
-          <rect x="76" y="80" width="118" height="14" rx="7" fill="url(#heroAccent)" />
-          <rect x="76" y="106" width="168" height="10" rx="5" fill="#DDE4FF" />
-          <rect x="76" y="123" width="134" height="10" rx="5" fill="#E8EDFF" />
+          <g class="net-grid">
+            <path d="M58 56H502M58 94H502M58 132H502M58 170H502M58 208H502M58 246H502M58 284H502" />
+            <path d="M94 40V292M166 40V292M238 40V292M310 40V292M382 40V292M454 40V292" />
+          </g>
 
-          <rect x="304" y="58" width="200" height="210" rx="18" fill="#FFFFFF" stroke="#DCE4FF" />
-          <rect x="324" y="80" width="160" height="12" rx="6" fill="url(#heroAccent)" />
-          <path d="M326 214c22-34 38-48 60-42 20 6 30 26 48 25 20-1 30-24 48-56"
-            stroke="url(#heroAccent)" stroke-width="7" fill="none" stroke-linecap="round" />
-          <path d="M326 214c22-34 38-48 60-42 20 6 30 26 48 25 20-1 30-24 48-56v73H326v0Z"
-            fill="url(#heroSoftLine)" />
+          <g class="net-links" stroke="url(#netStroke)">
+            <path d="M120 98 214 72 294 112 372 92 456 124" />
+            <path d="M108 214 188 188 264 236 332 204 430 226" />
+            <path d="M214 72 264 236M372 92 332 204" />
+            <path d="M294 112 264 236M120 98 108 214" />
+          </g>
 
-          <rect x="56" y="166" width="232" height="102" rx="16" fill="#FFFFFF" stroke="#DCE4FF" />
-          <rect x="76" y="186" width="190" height="9" rx="4.5" fill="#E5EAFF" />
-          <rect x="76" y="205" width="160" height="9" rx="4.5" fill="#EEF2FF" />
-          <rect x="76" y="224" width="144" height="9" rx="4.5" fill="#EEF2FF" />
-          <rect x="76" y="244" width="92" height="9" rx="4.5" fill="url(#heroAccent)" />
+          <g class="net-nodes">
+            <circle cx="120" cy="98" r="8" />
+            <circle cx="214" cy="72" r="9" />
+            <circle cx="294" cy="112" r="8" />
+            <circle cx="372" cy="92" r="8" />
+            <circle cx="456" cy="124" r="8" />
+            <circle cx="108" cy="214" r="8" />
+            <circle cx="188" cy="188" r="8" />
+            <circle cx="264" cy="236" r="8" />
+            <circle cx="332" cy="204" r="8" />
+            <circle cx="430" cy="226" r="8" />
+          </g>
 
-          <circle cx="472" cy="236" r="15" fill="#FFFFFF" stroke="#D4DEFF" />
-          <path d="M465 236h14M472 229v14" stroke="url(#heroAccent)" stroke-width="2.7" stroke-linecap="round" />
+          <circle class="net-aura" cx="278" cy="162" r="96" fill="url(#netAura)" />
+          <g class="net-core">
+            <circle cx="278" cy="162" r="28" fill="url(#netCore)" />
+            <circle cx="278" cy="162" r="15" fill="#FFFFFF" fill-opacity="0.92" />
+            <path d="M278 136V188M252 162H304" stroke="#2D59FE" stroke-width="5" stroke-linecap="round" />
+          </g>
         </svg>
       </div>
     </section>

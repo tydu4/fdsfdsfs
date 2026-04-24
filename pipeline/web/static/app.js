@@ -80,6 +80,92 @@ function humanizeFetchError(error) {
   return message;
 }
 
+function trimFileName(name, maxLen = 34) {
+  if (!name || name.length <= maxLen) return name || "Файл не выбран";
+  const ext = name.includes(".") ? name.slice(name.lastIndexOf(".")) : "";
+  const base = ext ? name.slice(0, -ext.length) : name;
+  return `${base.slice(0, Math.max(10, maxLen - ext.length - 1))}…${ext}`;
+}
+
+function updateSlotFileName(card, input) {
+  const caption = card.querySelector(".slot-file-name");
+  if (!caption) return;
+  const file = input.files && input.files.length ? input.files[0] : null;
+  if (!file) {
+    caption.textContent = "Файл не выбран";
+    card.classList.remove("has-file");
+    return;
+  }
+  caption.textContent = trimFileName(file.name);
+  card.classList.add("has-file");
+}
+
+function resetSlotCards() {
+  document.querySelectorAll(".slot-card").forEach(card => {
+    const input = card.querySelector('input[type="file"]');
+    if (input) updateSlotFileName(card, input);
+    card.classList.remove("drag-active");
+  });
+}
+
+function initUploadDropzones() {
+  const slotCards = document.querySelectorAll(".slot-card");
+  slotCards.forEach(card => {
+    const input = card.querySelector('input[type="file"]');
+    if (!input) return;
+
+    const format = (input.accept || "").toLowerCase().includes("csv") ? "CSV" : "XLSX";
+    const hint = document.createElement("div");
+    hint.className = "slot-drop-hint";
+    hint.innerHTML = `
+      <span class="slot-format">${format}</span>
+      <p class="slot-caption">Перетащите файл сюда или нажмите для выбора</p>
+      <p class="slot-file-name">Файл не выбран</p>
+    `;
+    card.append(hint);
+
+    card.tabIndex = 0;
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        input.click();
+      }
+    });
+
+    card.addEventListener("click", event => {
+      if (event.target === input) return;
+      input.click();
+    });
+
+    const showDrag = event => {
+      event.preventDefault();
+      card.classList.add("drag-active");
+    };
+    card.addEventListener("dragenter", showDrag);
+    card.addEventListener("dragover", showDrag);
+    card.addEventListener("dragleave", event => {
+      event.preventDefault();
+      if (!card.contains(event.relatedTarget)) {
+        card.classList.remove("drag-active");
+      }
+    });
+    card.addEventListener("drop", event => {
+      event.preventDefault();
+      card.classList.remove("drag-active");
+      const files = event.dataTransfer?.files;
+      if (!files || !files.length) return;
+      if (typeof DataTransfer === "undefined") return;
+      const transfer = new DataTransfer();
+      transfer.items.add(files[0]);
+      input.files = transfer.files;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+
+    input.addEventListener("change", () => updateSlotFileName(card, input));
+    updateSlotFileName(card, input);
+  });
+}
+
 function renderSummary(data) {
   const decision = data.decision || {};
   const overview = decision.overview || {};
@@ -430,6 +516,7 @@ uploadForm.addEventListener("submit", async event => {
     debtorState.datasetKey = "";
     debtorState.lastRequestKey = "";
     uploadForm.reset();
+    resetSlotCards();
     uploadMessage.textContent = `Запуск ${payload.run_id} создан.`;
     await refresh();
   } catch (error) {
@@ -466,5 +553,6 @@ debtorsSearch.addEventListener("input", () => {
   }, 280);
 });
 
+initUploadDropzones();
 refresh();
 setInterval(refresh, 2000);
