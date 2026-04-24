@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Debt Pipeline Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div>
+        <h1>Debt Decision Console</h1>
+        <p class="subtitle">Админ-панель для скоринга портфеля: профили должников, рекомендуемые меры на ближайший месяц и понятное обоснование решений.</p>
+      </div>
+      <button id="runBtn" type="button">Запустить пайплайн</button>
+    </div>
+  </header>
+  <main>
+    <section class="upload-panel">
+      <div>
+        <h2>Новый расчет из выгрузок</h2>
+        <p>Загрузите стандартные файлы из учетной системы. Система сама соберет расчетную витрину, выделит профили должников и выдаст рекомендации по мерам воздействия.</p>
+        <div class="upload-flow">
+          <div class="flow-step"><strong>1</strong><span>Берем эталонный пакет `01-14` как базу и константы модели.</span></div>
+          <div class="flow-step"><strong>2</strong><span>Подменяем загруженные пользователем выгрузки в нужных слотах.</span></div>
+          <div class="flow-step"><strong>3</strong><span>Запускаем полный pipeline и показываем результат выбранного запуска.</span></div>
+        </div>
+      </div>
+      <form id="uploadForm">
+        <div class="slot-grid">
+          <div class="slot-card">
+            <label>01 Профиль ЛС <small>опц.</small></label>
+            <input type="file" name="source_01" accept=".xlsx">
+          </div>
+          <div class="slot-card required">
+            <label>02 Баланс / ОСВ <small>обяз.</small></label>
+            <input type="file" name="source_02" accept=".xlsx" required>
+          </div>
+          <div class="slot-card required">
+            <label>03 Оплаты <small>обяз.</small></label>
+            <input type="file" name="source_03" accept=".csv" required>
+          </div>
+          <div class="slot-card">
+            <label>04 Автодозвон <small>рек.</small></label>
+            <input type="file" name="source_04" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>05 E-mail <small>рек.</small></label>
+            <input type="file" name="source_05" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>06 СМС <small>рек.</small></label>
+            <input type="file" name="source_06" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>07 Обзвон оператором <small>рек.</small></label>
+            <input type="file" name="source_07" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>08 Претензия <small>рек.</small></label>
+            <input type="file" name="source_08" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>09 Выезд к абоненту <small>рек.</small></label>
+            <input type="file" name="source_09" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>10 Уведомление об ограничении <small>рек.</small></label>
+            <input type="file" name="source_10" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>11 Ограничение <small>рек.</small></label>
+            <input type="file" name="source_11" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>12 Заявление о судебном приказе <small>рек.</small></label>
+            <input type="file" name="source_12" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>13 Судебный приказ / ИЛ <small>рек.</small></label>
+            <input type="file" name="source_13" accept=".xlsx">
+          </div>
+          <div class="slot-card">
+            <label>14 Лимиты мер <small>опц.</small></label>
+            <input type="file" name="source_14" accept=".xlsx">
+          </div>
+        </div>
+        <div class="form-actions">
+          <span class="upload-message" id="uploadMessage">Обязательные файлы: 02 и 03. Остальное можно оставить из базового пакета.</span>
+          <button id="uploadBtn" type="submit">Загрузить и рассчитать</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="summary" id="summary"></section>
+
+    <div class="section-title">
+      <h2>Вывод модели</h2>
+      <p id="stateText">Загрузка статуса...</p>
+    </div>
+    <section class="decision-grid" id="decisionOverview"></section>
+
+    <div class="section-title">
+      <h2>Сегментация портфеля</h2>
+      <p>Типовые профили должников и бизнес-гейты</p>
+    </div>
+    <section class="decision-grid" id="gateGrid"></section>
+
+    <div class="section-title">
+      <h2>Рекомендации по профилям</h2>
+      <p>Оптимальная мера, обоснование и ожидаемый эффект</p>
+    </div>
+    <section class="profile-list" id="profiles"></section>
+
+    <div class="section-title">
+      <h2>Качество и рациональность мер</h2>
+      <p>Uplift-модель, бизнес-ограничения и риск лишнего воздействия</p>
+    </div>
+    <section class="panel">
+      <div id="modelQuality"></div>
+    </section>
+
+    <div class="section-title">
+      <h2>Этапы</h2>
+      <p>Технический статус последнего расчета</p>
+    </div>
+    <section class="pipeline" id="pipeline"></section>
+    <p class="error" id="errorText"></p>
+
+    <div class="section-title">
+      <h2>Таблицы для проверки</h2>
+      <p>Сегменты, рекомендации и исходные расчетные таблицы</p>
+    </div>
+    <section class="artifact">
+      <div class="table-list" id="tables"></div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

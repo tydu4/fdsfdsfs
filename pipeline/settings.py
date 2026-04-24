@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-SOURCE_DIR = ROOT_DIR / "ТЗ"
+SOURCE_DIR = ROOT_DIR / "data"
 OUTPUT_DIR = ROOT_DIR / "output"
 PRESENTATION_DIR = OUTPUT_DIR / "presentation"
 RUNS_DIR = OUTPUT_DIR / "runs"

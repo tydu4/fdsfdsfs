@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pipeline.web_app import run_server
+from pipeline.web import run_server
 
 
 def main() -> None:

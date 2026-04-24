@@ -8,10 +8,10 @@ from pathlib import Path
 
 from pipeline.common import find_source_file
 from pipeline.constants import SOURCES
-from pipeline.web_app import (
+from pipeline.web.uploads import (
     UploadValidationError,
     UploadedFile,
-    _parse_multipart_form_data,
+    parse_multipart_form_data,
     build_uploaded_run_package,
 )
 
@@ -118,7 +118,7 @@ class WebUploadRunTests(unittest.TestCase):
             f"--{boundary}--\r\n"
         ).encode("utf-8")
 
-        files = _parse_multipart_form_data(f"multipart/form-data; boundary={boundary}", body)
+        files = parse_multipart_form_data(f"multipart/form-data; boundary={boundary}", body)
 
         self.assertEqual(files["source_02"].filename, "balance.xlsx")
         self.assertEqual(files["source_03"].filename, "payments.csv")

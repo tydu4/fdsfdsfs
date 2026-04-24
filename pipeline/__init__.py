@@ -1,4 +1,4 @@
-﻿"""Data pipeline for debt-collection case."""
+"""Data pipeline for debt-collection case."""
 
 __all__ = [
     "constants",
@@ -8,5 +8,5 @@ __all__ = [
     "build_uplift_prototype",
     "run_pipeline",
     "settings",
-    "web_app",
+    "web",
 ]

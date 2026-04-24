@@ -1,6 +1,6 @@
 # Debt Collection Decision Pipeline
 
-Проект строит единый data/ML-пайплайн для управления взысканием задолженности по лицевым счетам (ЛС). Он принимает исходные Excel/CSV-выгрузки из папки `ТЗ`, приводит их к нормальной аналитической структуре, строит месячную витрину признаков, сегментирует абонентов, оценивает эффект мер воздействия и готовит результаты для анализа и презентации.
+Проект строит единый data/ML-пайплайн для управления взысканием задолженности по лицевым счетам (ЛС). Он принимает исходные Excel/CSV-выгрузки из папки `data`, приводит их к нормальной аналитической структуре, строит месячную витрину признаков, сегментирует абонентов, оценивает эффект мер воздействия и готовит результаты для анализа и презентации.
 
 Главная точка входа:
 
@@ -27,7 +27,6 @@ case/
   main.py                         # единая точка входа: запускает локальный сайт
   pipeline/
     settings.py                   # централизованные настройки
-    web_app.py                    # localhost-интерфейс
     run_pipeline.py               # единый оркестратор этапов
     prepare_raw.py                # raw-слой
     build_normalized.py           # нормализация и DQ
@@ -36,14 +35,21 @@ case/
     build_uplift_prototype.py     # uplift-прототип и рекомендации
     build_presentation_viz.py     # графики
     build_presentation_notes.py   # структура доклада и заметки
-  ТЗ/                             # входные файлы 01..14
+    web/                          # localhost-интерфейс
+      server.py                   # HTTP-сервер и роутинг
+      state.py                    # состояние пайплайна
+      uploads.py                  # загрузка и валидация файлов
+      analytics.py                # агрегация и decision summary
+      helpers.py                  # утилиты и форматирование
+      static/                     # HTML, CSS, JS
+  data/                           # входные файлы 01..14
   output/                         # результаты пайплайна
 ```
 
 Параметры командной строки не используются. Основные настройки лежат в `pipeline/settings.py`:
 
 ```python
-SOURCE_DIR = ROOT_DIR / "ТЗ"
+SOURCE_DIR = ROOT_DIR / "data"
 OUTPUT_DIR = ROOT_DIR / "output"
 HOST = "127.0.0.1"
 PORT = 8000
@@ -73,7 +79,7 @@ PORT = 8000
 ## Общая схема пайплайна
 
 ```text
-ТЗ/*.xlsx, ТЗ/*.csv
+data/*.xlsx, data/*.csv
   -> output/raw
   -> output/normalized
   -> output/mart
@@ -581,7 +587,7 @@ recommended_measure = argmax(uplift_score)
 
 ## Локальный web-интерфейс
 
-`pipeline/web_app.py` запускает сайт на стандартной библиотеке Python (`ThreadingHTTPServer`). Дополнительный backend-фреймворк не нужен.
+`pipeline/web/` — пакет веб-интерфейса, запускает сайт на стандартной библиотеке Python (`ThreadingHTTPServer`). Дополнительный backend-фреймворк не нужен.
 
 Основные endpoint-ы:
 
