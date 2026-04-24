@@ -23,6 +23,7 @@ const debtorsLimit = document.getElementById("debtorsLimit");
 let currentRunId = null;
 let latestStatus = null;
 let searchTimer = null;
+let refreshInFlight = false;
 
 const debtorState = {
   query: "",
@@ -68,6 +69,15 @@ function fmtPct(value) {
 function pageCount(total, limit) {
   if (!total || !limit) return 0;
   return Math.max(1, Math.ceil(total / limit));
+}
+
+function humanizeFetchError(error) {
+  const message = String(error?.message || error || "").trim();
+  if (!message) return "Не удалось обновить данные.";
+  if (/failed to fetch/i.test(message)) {
+    return "Не удалось получить статус расчета. Проверьте, что сервер интерфейса запущен.";
+  }
+  return message;
 }
 
 function renderSummary(data) {
@@ -351,6 +361,8 @@ async function refreshDebtors(force = false) {
 }
 
 async function refresh() {
+  if (refreshInFlight) return;
+  refreshInFlight = true;
   try {
     const statusUrl = currentRunId ? `/api/runs/${currentRunId}/status` : "/api/status";
     const response = await fetch(statusUrl);
@@ -367,11 +379,13 @@ async function refresh() {
     renderModelQuality(data.decision.model_quality);
     renderStages(data.stages);
     renderTables(data.outputs.tables);
-    refreshDebtors();
+    await refreshDebtors();
   } catch (error) {
-    errorText.textContent = error.message || String(error);
+    errorText.textContent = humanizeFetchError(error);
     runBtn.disabled = false;
     uploadBtn.disabled = false;
+  } finally {
+    refreshInFlight = false;
   }
 }
 

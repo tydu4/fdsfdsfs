@@ -48,81 +48,99 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_internal_error(self, exc: Exception) -> None:
+        try:
+            self._send_json(
+                {"error": "internal_server_error", "message": str(exc)},
+                HTTPStatus.INTERNAL_SERVER_ERROR,
+            )
+        except Exception:
+            # Connection might be already broken; nothing else to do.
+            pass
+
     def do_GET(self) -> None:
-        parsed = urlparse(self.path)
-        path = parsed.path
-        query = parse_qs(parsed.query or "")
+        try:
+            parsed = urlparse(self.path)
+            path = parsed.path
+            query = parse_qs(parsed.query or "")
 
-        # --- Static files ---
-        if path == "/":
-            self._send_bytes(_read_static("index.html"), "text/html; charset=utf-8")
-            return
-        if path.startswith("/static/"):
-            self._serve_static(path)
-            return
-
-        # --- API ---
-        if path == "/api/status":
-            self._send_json(STATE.snapshot())
-            return
-        if path == "/api/runs":
-            self._send_json({"runs": list_runs()})
-            return
-        if path == "/api/debtors":
-            self._send_json(_build_debtors_payload(STATE.output_dir, query))
-            return
-
-        run_match = re.match(r"^/api/runs/([^/]+)/(status|results)$", path)
-        if run_match:
-            run_id = unquote(run_match.group(1))
-            try:
-                state = get_run_state(run_id)
-            except KeyError:
-                state = None
-            if state is None:
-                self._send_json({"error": "run_not_found"}, HTTPStatus.NOT_FOUND)
+            # --- Static files ---
+            if path == "/":
+                self._send_bytes(_read_static("index.html"), "text/html; charset=utf-8")
                 return
-            if run_match.group(2) == "status":
-                self._send_json(state.snapshot())
+            if path.startswith("/static/"):
+                self._serve_static(path)
                 return
-            self._send_json({
-                "run_id": state.run_id,
-                "decision": collect_decision_summary(state.output_dir),
-                "outputs": collect_outputs(state.output_dir),
-                "last_metrics": read_json(state.output_dir / "load_metrics_pipeline.json"),
-            })
-            return
-        run_debtors_match = re.match(r"^/api/runs/([^/]+)/debtors$", path)
-        if run_debtors_match:
-            run_id = unquote(run_debtors_match.group(1))
-            try:
-                state = get_run_state(run_id)
-            except KeyError:
-                state = None
-            if state is None:
-                self._send_json({"error": "run_not_found"}, HTTPStatus.NOT_FOUND)
+
+            # --- API ---
+            if path == "/api/status":
+                self._send_json(STATE.snapshot())
                 return
-            self._send_json(_build_debtors_payload(state.output_dir, query))
-            return
+            if path == "/api/runs":
+                self._send_json({"runs": list_runs()})
+                return
+            if path == "/api/debtors":
+                self._send_json(_build_debtors_payload(STATE.output_dir, query))
+                return
 
-        if path.startswith("/outputs/"):
-            self._serve_output(path)
-            return
+            run_match = re.match(r"^/api/runs/([^/]+)/(status|results)$", path)
+            if run_match:
+                run_id = unquote(run_match.group(1))
+                try:
+                    state = get_run_state(run_id)
+                except KeyError:
+                    state = None
+                if state is None:
+                    self._send_json({"error": "run_not_found"}, HTTPStatus.NOT_FOUND)
+                    return
+                if run_match.group(2) == "status":
+                    self._send_json(state.snapshot())
+                    return
+                self._send_json({
+                    "run_id": state.run_id,
+                    "decision": collect_decision_summary(state.output_dir),
+                    "outputs": collect_outputs(state.output_dir),
+                    "last_metrics": read_json(state.output_dir / "load_metrics_pipeline.json"),
+                })
+                return
+            run_debtors_match = re.match(r"^/api/runs/([^/]+)/debtors$", path)
+            if run_debtors_match:
+                run_id = unquote(run_debtors_match.group(1))
+                try:
+                    state = get_run_state(run_id)
+                except KeyError:
+                    state = None
+                if state is None:
+                    self._send_json({"error": "run_not_found"}, HTTPStatus.NOT_FOUND)
+                    return
+                self._send_json(_build_debtors_payload(state.output_dir, query))
+                return
 
-        self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+            if path.startswith("/outputs/"):
+                self._serve_output(path)
+                return
+
+            self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            traceback.print_exc()
+            self._send_internal_error(exc)
 
     def do_POST(self) -> None:
-        path = urlparse(self.path).path
-        if path == "/api/run":
-            if not start_pipeline_run():
-                self._send_json({"error": "pipeline_already_running"}, HTTPStatus.CONFLICT)
+        try:
+            path = urlparse(self.path).path
+            if path == "/api/run":
+                if not start_pipeline_run():
+                    self._send_json({"error": "pipeline_already_running"}, HTTPStatus.CONFLICT)
+                    return
+                self._send_json({"ok": True, "run_id": "default"})
                 return
-            self._send_json({"ok": True, "run_id": "default"})
-            return
-        if path == "/api/runs":
-            self._handle_create_run()
-            return
-        self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+            if path == "/api/runs":
+                self._handle_create_run()
+                return
+            self._send_json({"error": "not_found"}, HTTPStatus.NOT_FOUND)
+        except Exception as exc:
+            traceback.print_exc()
+            self._send_internal_error(exc)
 
     def _handle_create_run(self) -> None:
         from .state import ACTIVE_RUN_ID as _active_run_id

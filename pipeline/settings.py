@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .constants import ACTION_TYPES
+
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 SOURCE_DIR = ROOT_DIR / "data"
@@ -24,7 +26,7 @@ PIPELINE_CONFIG = {
         "k_hybrid_per_gate": 4,
     },
     "uplift": {
-        "measures": "sms,operator_call,restriction_notice",
+        "measures": ",".join(ACTION_TYPES),
         "max_train_rows": 250000,
         "random_state": 42,
     },

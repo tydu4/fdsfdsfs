@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Калькулятор мер взыскания</title>
+  <title>Хакатон: дашборд взыскания</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
@@ -15,17 +15,7 @@
 <body>
   <header class="site-header" id="top">
     <div class="nav-shell">
-      <a class="brand" href="#hero">
-        <span class="brand-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2 2 7l10 5 10-5-10-5Zm-8 8 8 4 8-4v7l-8 4-8-4v-7Z" />
-          </svg>
-        </span>
-        <span class="brand-text">
-          <strong>Калькулятор взыскания</strong>
-        </span>
-      </a>
-      <nav class="main-nav">
+      <nav class="main-nav" aria-label="Разделы дашборда">
         <a href="#data-upload">Загрузка</a>
         <a href="#overview">Обзор</a>
         <a href="#pipeline-section">Этапы</a>
@@ -51,22 +41,43 @@
       <div class="hero-visual" aria-hidden="true">
         <svg class="hero-illustration" viewBox="0 0 560 330">
           <defs>
-            <linearGradient id="heroLine" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#2342F6" />
-              <stop offset="100%" stop-color="#7A22F7" />
+            <linearGradient id="heroFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#F6F8FF" />
+              <stop offset="100%" stop-color="#FBF7FF" />
+            </linearGradient>
+            <linearGradient id="heroAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2342F6" stop-opacity="0.86" />
+              <stop offset="100%" stop-color="#7A22F7" stop-opacity="0.78" />
+            </linearGradient>
+            <linearGradient id="heroSoftLine" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#2342F6" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#7A22F7" stop-opacity="0.16" />
             </linearGradient>
           </defs>
-          <rect x="36" y="40" width="488" height="250" rx="24" fill="#f8f9ff" stroke="#d9e1ff" />
-          <rect x="70" y="72" width="180" height="18" rx="9" fill="url(#heroLine)" />
-          <rect x="70" y="103" width="250" height="12" rx="6" fill="#d5ddff" />
-          <rect x="70" y="126" width="210" height="12" rx="6" fill="#e4e9ff" />
-          <rect x="70" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
-          <rect x="214" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
-          <rect x="358" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
-          <path d="M96 231 130 198l24 22 20-26" stroke="#2342F6" stroke-width="7" fill="none" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <circle cx="447" cy="94" r="34" fill="url(#heroLine)" />
-          <path d="M432 94h30M447 79v30" stroke="#fff" stroke-width="6" stroke-linecap="round" />
+          <rect x="26" y="28" width="508" height="274" rx="30" fill="url(#heroFrame)" stroke="#DCE4FF" />
+          <circle cx="468" cy="68" r="48" fill="url(#heroSoftLine)" />
+          <circle cx="108" cy="268" r="56" fill="url(#heroSoftLine)" />
+
+          <rect x="56" y="58" width="232" height="92" rx="16" fill="#FFFFFF" stroke="#DCE4FF" />
+          <rect x="76" y="80" width="118" height="14" rx="7" fill="url(#heroAccent)" />
+          <rect x="76" y="106" width="168" height="10" rx="5" fill="#DDE4FF" />
+          <rect x="76" y="123" width="134" height="10" rx="5" fill="#E8EDFF" />
+
+          <rect x="304" y="58" width="200" height="210" rx="18" fill="#FFFFFF" stroke="#DCE4FF" />
+          <rect x="324" y="80" width="160" height="12" rx="6" fill="url(#heroAccent)" />
+          <path d="M326 214c22-34 38-48 60-42 20 6 30 26 48 25 20-1 30-24 48-56"
+            stroke="url(#heroAccent)" stroke-width="7" fill="none" stroke-linecap="round" />
+          <path d="M326 214c22-34 38-48 60-42 20 6 30 26 48 25 20-1 30-24 48-56v73H326v0Z"
+            fill="url(#heroSoftLine)" />
+
+          <rect x="56" y="166" width="232" height="102" rx="16" fill="#FFFFFF" stroke="#DCE4FF" />
+          <rect x="76" y="186" width="190" height="9" rx="4.5" fill="#E5EAFF" />
+          <rect x="76" y="205" width="160" height="9" rx="4.5" fill="#EEF2FF" />
+          <rect x="76" y="224" width="144" height="9" rx="4.5" fill="#EEF2FF" />
+          <rect x="76" y="244" width="92" height="9" rx="4.5" fill="url(#heroAccent)" />
+
+          <circle cx="472" cy="236" r="15" fill="#FFFFFF" stroke="#D4DEFF" />
+          <path d="M465 236h14M472 229v14" stroke="url(#heroAccent)" stroke-width="2.7" stroke-linecap="round" />
         </svg>
       </div>
     </section>
