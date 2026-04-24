@@ -14,6 +14,7 @@ from .helpers import (
 
 
 _DECISION_CACHE: dict[str, Any] = {"signature": None, "payload": None}
+_DEBTOR_CACHE: dict[str, Any] = {"signature": None, "rows": None}
 
 
 def _rows_from_metrics(output_dir: Path) -> dict[str, int]:
@@ -234,3 +235,112 @@ def collect_decision_summary(output_dir: Path = OUTPUT_DIR) -> dict[str, Any]:
     _DECISION_CACHE["signature"] = signature
     _DECISION_CACHE["payload"] = payload
     return payload
+
+
+def _debtor_source_paths(output_dir: Path) -> tuple[Path, Path]:
+    rec_path = output_dir / "mart" / "uplift_recommendations.csv"
+    if not rec_path.exists():
+        rec_path = output_dir / "uplift" / "uplift_recommendations.csv"
+    mart_path = output_dir / "mart" / "mart_ls_month.csv"
+    return rec_path, mart_path
+
+
+def _build_debtor_rows(output_dir: Path) -> list[dict[str, Any]]:
+    rec_path, mart_path = _debtor_source_paths(output_dir)
+    rec_rows = read_csv_rows(rec_path)
+    if not rec_rows:
+        return []
+
+    mart_rows = read_csv_rows(mart_path)
+    mart_by_key: dict[tuple[str, str], dict[str, str]] = {}
+    mart_by_ls: dict[str, dict[str, str]] = {}
+    for row in mart_rows:
+        ls_id = str(row.get("ls_id", "")).strip()
+        month = str(row.get("month", "")).strip()
+        if not ls_id:
+            continue
+        mart_by_key[(ls_id, month)] = row
+        saved = mart_by_ls.get(ls_id)
+        if saved is None or str(saved.get("month", "")) < month:
+            mart_by_ls[ls_id] = row
+
+    result: list[dict[str, Any]] = []
+    for row in rec_rows:
+        ls_id = str(row.get("ls_id", "")).strip()
+        if not ls_id:
+            continue
+        month = str(row.get("month", "")).strip()
+        gate = str(row.get("business_gate", "")).strip()
+        measure = str(row.get("recommended_measure", "")).strip() or "no_action"
+        reason = str(row.get("recommendation_reason", "")).strip()
+        mart = mart_by_key.get((ls_id, month)) or mart_by_ls.get(ls_id) or {}
+
+        uplift_pct = round(to_float(row.get("recommended_uplift"), 0.0) * 100.0, 2)
+        second_uplift_pct = round(to_float(row.get("second_uplift"), 0.0) * 100.0, 2)
+        debt = round(to_float(mart.get("debt_start_t"), 0.0), 2)
+        paid = round(to_float(mart.get("paid_amt_t"), 0.0), 2)
+        paid_3m = round(to_float(mart.get("payment_amount_l3m"), 0.0), 2)
+        contacts = to_int(mart.get("contact_channels_count"), 0)
+        is_action = measure != "no_action" and uplift_pct > 0
+
+        result.append({
+            "ls_id": ls_id,
+            "month": month,
+            "business_gate": gate,
+            "business_gate_label": pretty_gate(gate),
+            "hybrid_segment": str(row.get("hybrid_segment", "")).strip(),
+            "gate_ml_eligible": str(row.get("gate_ml_eligible", "")).strip() == "1",
+            "recommended_measure": measure,
+            "recommended_measure_label": pretty_measure(measure),
+            "recommended_uplift_pct": uplift_pct,
+            "second_measure": str(row.get("second_measure", "")).strip(),
+            "second_measure_label": pretty_measure(str(row.get("second_measure", "")).strip() or "no_action"),
+            "second_uplift_pct": second_uplift_pct,
+            "recommendation_reason": reason,
+            "recommendation_reason_label": pretty_reason(reason),
+            "debt_start_t": debt,
+            "paid_amt_t": paid,
+            "payment_amount_l3m": paid_3m,
+            "contact_channels_count": contacts,
+            "is_action": is_action,
+        })
+
+    return result
+
+
+def collect_debtor_recommendations(
+    output_dir: Path = OUTPUT_DIR,
+    *,
+    offset: int = 0,
+    limit: int = 50,
+    query: str = "",
+) -> dict[str, Any]:
+    rec_path, mart_path = _debtor_source_paths(output_dir)
+    signature = file_signature([rec_path, mart_path])
+    rows = _DEBTOR_CACHE.get("rows")
+    if _DEBTOR_CACHE.get("signature") != signature or rows is None:
+        rows = _build_debtor_rows(output_dir)
+        _DEBTOR_CACHE["signature"] = signature
+        _DEBTOR_CACHE["rows"] = rows
+
+    filtered = rows
+    q = query.strip().lower()
+    if q:
+        filtered = [
+            item for item in rows
+            if q in item["ls_id"].lower()
+            or q in item["business_gate_label"].lower()
+            or q in item["recommended_measure_label"].lower()
+            or q in item["hybrid_segment"].lower()
+        ]
+
+    safe_offset = max(int(offset), 0)
+    safe_limit = max(int(limit), 1)
+    page_rows = filtered[safe_offset:safe_offset + safe_limit]
+    return {
+        "total": len(filtered),
+        "offset": safe_offset,
+        "limit": safe_limit,
+        "rows": page_rows,
+        "has_data": bool(rows),
+    }

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Debt Pipeline Dashboard</title>
+  <title>Калькулятор мер взыскания</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap"
@@ -18,28 +18,25 @@
       <a class="brand" href="#hero">
         <span class="brand-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path
-              d="M12 2c5.523 0 10 4.477 10 10S17.523 22 12 22 2 17.523 2 12 6.477 2 12 2Zm-1 5v10l7-5-7-5Z" />
+            <path d="M12 2 2 7l10 5 10-5-10-5Zm-8 8 8 4 8-4v7l-8 4-8-4v-7Z" />
           </svg>
         </span>
         <span class="brand-text">
-          <strong>Debt Console</strong>
-          <small>Smart Collection UI</small>
+          <strong>Калькулятор взыскания</strong>
         </span>
       </a>
       <nav class="main-nav">
-        <a href="#hero">Главная</a>
         <a href="#data-upload">Загрузка</a>
         <a href="#overview">Обзор</a>
+        <a href="#pipeline-section">Этапы</a>
+        <a href="#debtors-section">Должники</a>
         <a href="#decisions">Решение</a>
         <a href="#segments">Сегменты</a>
         <a href="#profiles-section">Профили</a>
-        <a href="#quality">Качество</a>
-        <a href="#pipeline-section">Этапы</a>
         <a href="#tables-section">Таблицы</a>
       </nav>
       <div class="header-action">
-        <button id="runBtn" type="button">Запустить пайплайн</button>
+        <button id="runBtn" type="button">Запустить расчет</button>
       </div>
     </div>
   </header>
@@ -47,54 +44,29 @@
   <main>
     <section class="hero-section landing-section" id="hero">
       <div class="hero-copy">
-        <p class="kicker">Debt Decision Console</p>
-        <h1>Понятные рекомендации по должникам без визуальной перегрузки</h1>
-        <p class="subtitle">Единый рабочий экран для скоринга портфеля, сегментации и выбора мер воздействия на
-          ближайший месяц с объяснимой логикой решений.</p>
-        <div class="hero-pills">
-          <span class="hero-pill">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 12h16M12 4v16" />
-            </svg>
-            Полный пайплайн
-          </span>
-          <span class="hero-pill">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m4 16 5-5 4 4 7-7" />
-            </svg>
-            Uplift-подход
-          </span>
-          <span class="hero-pill">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 6h16M4 12h10M4 18h7" />
-            </svg>
-            Четкая структура
-          </span>
-        </div>
+        <h1>Решения по должникам в реальном времени</h1>
+        <p class="subtitle">Загрузите файлы, запустите расчет и сразу смотрите рекомендации, прогресс этапов и
+          результат по каждому лицевому счету.</p>
       </div>
       <div class="hero-visual" aria-hidden="true">
-        <svg class="hero-illustration" viewBox="0 0 600 420">
+        <svg class="hero-illustration" viewBox="0 0 560 330">
           <defs>
-            <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="heroLine" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#2342F6" />
               <stop offset="100%" stop-color="#7A22F7" />
             </linearGradient>
-            <linearGradient id="heroSoft" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#EEF2FF" />
-              <stop offset="100%" stop-color="#F5EEFF" />
-            </linearGradient>
           </defs>
-          <rect x="72" y="54" width="456" height="300" rx="26" fill="url(#heroSoft)" stroke="#DCE3FF" />
-          <rect x="102" y="92" width="196" height="24" rx="12" fill="url(#heroGrad)" />
-          <rect x="102" y="130" width="252" height="14" rx="7" fill="#CAD4FF" />
-          <rect x="102" y="154" width="210" height="14" rx="7" fill="#DDE4FF" />
-          <rect x="102" y="205" width="126" height="114" rx="16" fill="#FFFFFF" stroke="#DCE3FF" />
-          <rect x="242" y="205" width="126" height="114" rx="16" fill="#FFFFFF" stroke="#DCE3FF" />
-          <rect x="382" y="205" width="116" height="114" rx="16" fill="#FFFFFF" stroke="#DCE3FF" />
-          <path d="M132 287 166 252l24 22 24-28" stroke="#2342F6" stroke-width="8" fill="none"
-            stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="454" cy="118" r="44" fill="url(#heroGrad)" opacity="0.96" />
-          <path d="M430 118h48M454 94v48" stroke="#fff" stroke-width="8" stroke-linecap="round" />
+          <rect x="36" y="40" width="488" height="250" rx="24" fill="#f8f9ff" stroke="#d9e1ff" />
+          <rect x="70" y="72" width="180" height="18" rx="9" fill="url(#heroLine)" />
+          <rect x="70" y="103" width="250" height="12" rx="6" fill="#d5ddff" />
+          <rect x="70" y="126" width="210" height="12" rx="6" fill="#e4e9ff" />
+          <rect x="70" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
+          <rect x="214" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
+          <rect x="358" y="165" width="130" height="94" rx="14" fill="#fff" stroke="#d9e1ff" />
+          <path d="M96 231 130 198l24 22 20-26" stroke="#2342F6" stroke-width="7" fill="none" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <circle cx="447" cy="94" r="34" fill="url(#heroLine)" />
+          <path d="M432 94h30M447 79v30" stroke="#fff" stroke-width="6" stroke-linecap="round" />
         </svg>
       </div>
     </section>
@@ -105,21 +77,17 @@
           <div class="section-heading">
             <span class="section-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
-                <path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3h16v-3" />
+                <path d="M12 16V4m0 0-4 4m4-4 4 4M4 17v3h16v-3" />
               </svg>
             </span>
-            <h2>Новый расчет из выгрузок</h2>
+            <h2>Загрузка файлов</h2>
           </div>
         </div>
-        <p>Загрузите стандартные файлы из учетной системы. Система сама соберет расчетную витрину, выделит профили
-          должников и выдаст рекомендации по мерам воздействия.</p>
+        <p>Обязательные файлы: 02 и 03. Остальные можно оставить из базового пакета.</p>
         <div class="upload-flow">
-          <div class="flow-step"><strong>1</strong><span>Берем эталонный пакет `01-14` как базу и константы
-              модели.</span></div>
-          <div class="flow-step"><strong>2</strong><span>Подменяем загруженные пользователем выгрузки в нужных
-              слотах.</span></div>
-          <div class="flow-step"><strong>3</strong><span>Запускаем полный pipeline и показываем результат выбранного
-              запуска.</span></div>
+          <div class="flow-step"><strong>1</strong><span>Загрузите файлы.</span></div>
+          <div class="flow-step"><strong>2</strong><span>Запустите расчет.</span></div>
+          <div class="flow-step"><strong>3</strong><span>Следите за этапами и рекомендациями.</span></div>
         </div>
       </div>
       <form id="uploadForm">
@@ -182,8 +150,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <span class="upload-message" id="uploadMessage">Обязательные файлы: 02 и 03. Остальное можно оставить из
-            базового пакета.</span>
+          <span class="upload-message" id="uploadMessage">Ожидание загрузки файлов.</span>
           <button id="uploadBtn" type="submit">Загрузить и рассчитать</button>
         </div>
       </form>
@@ -197,11 +164,77 @@
               <path d="M4 20h16M7 16V8m5 8V4m5 12v-6" />
             </svg>
           </span>
-          <h2>Обзор запуска</h2>
+          <h2>Обзор</h2>
         </div>
-        <p id="stateText">Загрузка статуса...</p>
+        <p id="stateText">Ожидание запуска.</p>
       </div>
       <section class="summary" id="summary"></section>
+    </section>
+
+    <section class="section-shell landing-section" id="pipeline-section">
+      <div class="section-title">
+        <div class="section-heading">
+          <span class="section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16M4 12h12M4 17h8" />
+            </svg>
+          </span>
+          <h2>Этапы расчета</h2>
+        </div>
+        <p>Текущий прогресс</p>
+      </div>
+      <section class="pipeline" id="pipeline"></section>
+      <p class="error" id="errorText"></p>
+    </section>
+
+    <section class="section-shell landing-section" id="debtors-section">
+      <div class="section-title">
+        <div class="section-heading">
+          <span class="section-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5h16v14H4V5Zm0 5h16M9 5v14" />
+            </svg>
+          </span>
+          <h2>Итоги по должникам</h2>
+        </div>
+        <p id="debtorsMeta">Нет данных</p>
+      </div>
+      <div class="table-toolbar">
+        <label class="search-field">
+          <span>Поиск</span>
+          <input id="debtorsSearch" type="search" placeholder="ЛС, сегмент или мера">
+        </label>
+        <label class="limit-field">
+          <span>Строк на странице</span>
+          <select id="debtorsLimit">
+            <option value="20">20</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+      </div>
+      <div class="debtors-wrap">
+        <table class="debtors-table">
+          <thead>
+            <tr>
+              <th>ЛС</th>
+              <th>Сегмент</th>
+              <th>Рекомендация</th>
+              <th>Uplift</th>
+              <th>Долг</th>
+              <th>Оплаты 3м</th>
+              <th>Контакты</th>
+            </tr>
+          </thead>
+          <tbody id="debtorsBody"></tbody>
+        </table>
+        <p class="empty" id="debtorsEmpty">Таблица появится после расчета.</p>
+      </div>
+      <div class="table-pagination">
+        <button id="debtorsPrev" type="button" class="ghost-btn">Назад</button>
+        <span id="debtorsPageInfo">0 / 0</span>
+        <button id="debtorsNext" type="button" class="ghost-btn">Дальше</button>
+      </div>
     </section>
 
     <section class="section-shell landing-section" id="decisions">
@@ -209,12 +242,12 @@
         <div class="section-heading">
           <span class="section-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
-              <path d="M5 12h6l2 3 6-8" />
+              <path d="M5 12h5l2 3 7-8" />
             </svg>
           </span>
-          <h2>Вывод модели</h2>
+          <h2>Решение модели</h2>
         </div>
-        <p>Ключевое решение на ближайший месяц</p>
+        <p>Сводка по портфелю</p>
       </div>
       <section class="decision-grid" id="decisionOverview"></section>
     </section>
@@ -227,9 +260,9 @@
               <path d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 3h7v4h-7v-4Z" />
             </svg>
           </span>
-          <h2>Сегментация портфеля</h2>
+          <h2>Сегменты</h2>
         </div>
-        <p>Типовые профили должников и бизнес-гейты</p>
+        <p>Профили и гейты</p>
       </div>
       <section class="decision-grid" id="gateGrid"></section>
     </section>
@@ -244,7 +277,7 @@
           </span>
           <h2>Рекомендации по профилям</h2>
         </div>
-        <p>Оптимальная мера, обоснование и ожидаемый эффект</p>
+        <p>Оптимальная мера и обоснование</p>
       </div>
       <section class="profile-list" id="profiles"></section>
     </section>
@@ -257,29 +290,13 @@
               <path d="m4 14 4-4 3 3 5-6 4 4M4 20h16" />
             </svg>
           </span>
-          <h2>Качество и рациональность мер</h2>
+          <h2>Качество модели</h2>
         </div>
-        <p>Uplift-модель, бизнес-ограничения и риск лишнего воздействия</p>
+        <p>Метрики uplift</p>
       </div>
       <section class="panel">
         <div id="modelQuality"></div>
       </section>
-    </section>
-
-    <section class="section-shell landing-section" id="pipeline-section">
-      <div class="section-title">
-        <div class="section-heading">
-          <span class="section-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 7h16M4 12h12M4 17h8" />
-            </svg>
-          </span>
-          <h2>Этапы</h2>
-        </div>
-        <p>Технический статус последнего расчета</p>
-      </div>
-      <section class="pipeline" id="pipeline"></section>
-      <p class="error" id="errorText"></p>
     </section>
 
     <section class="section-shell landing-section" id="tables-section">
@@ -290,9 +307,9 @@
               <path d="M4 5h16v14H4V5Zm0 5h16M10 5v14" />
             </svg>
           </span>
-          <h2>Таблицы для проверки</h2>
+          <h2>Таблицы</h2>
         </div>
-        <p>Сегменты, рекомендации и исходные расчетные таблицы</p>
+        <p>Файлы расчета</p>
       </div>
       <section class="artifact">
         <div class="table-list" id="tables"></div>

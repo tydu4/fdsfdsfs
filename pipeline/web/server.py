@@ -7,10 +7,10 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from ..settings import HOST, OUTPUT_DIR, PORT
-from .analytics import collect_decision_summary, collect_outputs
+from .analytics import collect_decision_summary, collect_debtor_recommendations, collect_outputs
 from .helpers import read_json
 from .state import (
     STATE, ACTIVE_RUN_ID, PipelineState, RUN_STATES_LOCK,
@@ -49,7 +49,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self) -> None:
-        path = urlparse(self.path).path
+        parsed = urlparse(self.path)
+        path = parsed.path
+        query = parse_qs(parsed.query or "")
 
         # --- Static files ---
         if path == "/":
@@ -65,6 +67,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/runs":
             self._send_json({"runs": list_runs()})
+            return
+        if path == "/api/debtors":
+            self._send_json(_build_debtors_payload(STATE.output_dir, query))
             return
 
         run_match = re.match(r"^/api/runs/([^/]+)/(status|results)$", path)
@@ -86,6 +91,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 "outputs": collect_outputs(state.output_dir),
                 "last_metrics": read_json(state.output_dir / "load_metrics_pipeline.json"),
             })
+            return
+        run_debtors_match = re.match(r"^/api/runs/([^/]+)/debtors$", path)
+        if run_debtors_match:
+            run_id = unquote(run_debtors_match.group(1))
+            try:
+                state = get_run_state(run_id)
+            except KeyError:
+                state = None
+            if state is None:
+                self._send_json({"error": "run_not_found"}, HTTPStatus.NOT_FOUND)
+                return
+            self._send_json(_build_debtors_payload(state.output_dir, query))
             return
 
         if path.startswith("/outputs/"):
@@ -193,6 +210,22 @@ def _find_free_port(host: str, preferred_port: int) -> int:
                 continue
             return port
     raise RuntimeError(f"No free localhost port found starting from {preferred_port}")
+
+
+def _query_int(query: dict[str, list[str]], key: str, default: int) -> int:
+    try:
+        return int(query.get(key, [str(default)])[0])
+    except (TypeError, ValueError):
+        return default
+
+
+def _build_debtors_payload(output_dir: Path, query: dict[str, list[str]]) -> dict[str, Any]:
+    return collect_debtor_recommendations(
+        output_dir=output_dir,
+        offset=_query_int(query, "offset", 0),
+        limit=_query_int(query, "limit", 50),
+        query=query.get("q", [""])[0],
+    )
 
 
 def _write_server_marker(url: str, port: int) -> None:

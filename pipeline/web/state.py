@@ -87,6 +87,12 @@ class PipelineState:
         with self._lock:
             stages = json.loads(json.dumps(self._stages, ensure_ascii=False))
             running = self._running
+            pristine_default = (
+                self.run_id == "default"
+                and not running
+                and self._started_at is None
+                and self._finished_at is None
+            )
             payload = {
                 "run_id": self.run_id,
                 "mode": self.manifest.get("mode", "default_full_run"),
@@ -100,11 +106,11 @@ class PipelineState:
                 "last_error": self._last_error,
                 "month": self._month,
                 "stages": stages,
-                "outputs": collect_outputs(self.output_dir),
-                "decision": collect_decision_summary(self.output_dir),
-                "last_metrics": read_json(self.output_dir / "load_metrics_pipeline.json"),
+                "outputs": collect_outputs(self.output_dir) if not pristine_default else {"tables": []},
+                "decision": collect_decision_summary(self.output_dir) if not pristine_default else _empty_decision(),
+                "last_metrics": read_json(self.output_dir / "load_metrics_pipeline.json") if not pristine_default else None,
             }
-        if not running:
+        if not running and not pristine_default:
             _hydrate_from_last_metrics(payload, self.output_dir)
         return payload
 
@@ -262,3 +268,28 @@ def _month_from_metrics(metrics: dict[str, Any]) -> str | None:
         if value:
             return str(value)[:7]
     return None
+
+
+def _empty_decision() -> dict[str, Any]:
+    return {
+        "score_month": "",
+        "overview": {
+            "total_accounts": 0,
+            "positive_actions": 0,
+            "positive_actions_share_pct": 0.0,
+            "no_action": 0,
+            "no_action_share_pct": 0.0,
+            "rule_blocked": 0,
+            "rule_blocked_share_pct": 0.0,
+            "non_positive_uplift": 0,
+            "non_positive_uplift_share_pct": 0.0,
+            "expected_incremental_payers": 0.0,
+        },
+        "gates": [],
+        "profiles": [],
+        "profile_count": 0,
+        "recommendation_mix": [],
+        "reason_mix": [],
+        "model_quality": [],
+        "cluster_mix_by_gate": {},
+    }
